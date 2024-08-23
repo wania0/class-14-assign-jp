@@ -1,21 +1,30 @@
 use hr_db;
 
 # Group BY
+
 # Write a query to get the number of employees who has the same job title.
+# Solution:
 SELECT 
     COUNT(EMPLOYEE_ID) AS number_of_employees, JOB_ID
 FROM
     employees
 GROUP BY JOB_ID;
 
+
+
 # list down the lowest salary of the employee of every manager and also display the manager_id.
+# Solution:
 SELECT 
     MIN(SALARY) AS lowest_salary, MANAGER_ID
 FROM
     employees
 GROUP BY MANAGER_ID;
 
-# list down the total salaries of every deparment # NOTE: salary should be in ascending order
+
+
+
+# list down the total salaries of every deparment # NOTE: salary should be in ascending order.
+# Solution:
 SELECT 
     SUM(SALARY) AS total_salary, DEPARTMENT_ID
 FROM
@@ -23,7 +32,10 @@ FROM
 GROUP BY DEPARTMENT_ID
 ORDER BY total_salary;
 
-# list down the average salaries of every department exluding IT Deparment
+
+
+# list down the average salaries of every department exluding IT Deparment.
+# Solution:
 SELECT 
     AVG(SALARY) AS average_salary, JOB_ID
 FROM
@@ -32,7 +44,10 @@ WHERE
     JOB_ID != 'IT_PROG'
 GROUP BY JOB_ID;
 
-# fetch the top 3 department who is taking the highest salary among all other deparment
+
+
+# fetch the top 3 department who is taking the highest salary among all other deparment.
+# Solution:
 SELECT 
     MAX(SALARY) AS maximum_salary, DEPARTMENT_ID
 FROM
@@ -42,7 +57,10 @@ ORDER BY maximum_salary DESC
 LIMIT 3;
 
 
+
 -- # Write a query to get employee ID, last name, and date of first department (where he was working in, table name "job_history") of the employees."
+# Solution:
+# maybe its wrong sir will discuss in class
 -- SELECT 
 --     e.EMPLOYEE_ID,
 --     e.LAST_NAME,
@@ -53,7 +71,8 @@ LIMIT 3;
 --     job_history jh ON e.EMPLOYEE_ID = jh.EMPLOYEE_ID
 -- GROUP BY e.EMPLOYEE_ID , e.LAST_NAME;
 
-# find the department that contains more than 10 employees
+# find the department that contains more than 10 employees.
+# Solution:
 SELECT 
     COUNT(*) AS employee_count, DEPARTMENT_ID
 FROM
@@ -61,66 +80,102 @@ FROM
 GROUP BY DEPARTMENT_ID
 HAVING employee_count > 10;
 
+
+
 # Find the number of employees in each department.
+# Solution:
 SELECT 
     COUNT(*) AS number_of_employees, department_id
 FROM
     employees
 GROUP BY department_id;
 
+
+
 -- Calculate the average salary for each job title.
+# Solution:
 SELECT 
     JOB_ID, AVG(SALARY)
 FROM
     employees
 GROUP BY JOB_ID;
 
+
+
 -- List the total salary expenditure for each department.
+# Solution:
 SELECT 
     DEPARTMENT_ID, SUM(SALARY) AS total_salary
 FROM
     employees
 GROUP BY DEPARTMENT_ID;
 
+
+
 -- Find the maximum salary in each department.
+# Solution:
 SELECT 
     DEPARTMENT_ID, MAX(SALARY) AS maximum_salaray
 FROM
     employees
 GROUP BY DEPARTMENT_ID;
 
+
+
 -- Count the number of employees hired in each year.
+# Solution:
 SELECT 
     COUNT(*) AS employee_count, YEAR(HIRE_DATE) AS year
 FROM
     employees
 GROUP BY YEAR(HIRE_DATE);
 
+
+
 -- Determine the number of employees with the same manager.
+# Solution:
 SELECT 
     MANAGER_ID, COUNT(*) AS employee_count
 FROM
     employees
 GROUP BY MANAGER_ID;
 
+
+
 -- Find the average commission percentage for each department.
+# Solution:
 SELECT 
     DEPARTMENT_ID, AVG(COMMISSION_PCT) AS average_comission
 FROM
     employees
 GROUP BY DEPARTMENT_ID;
 
+
+
 -- Calculate the total duration (in days) that each employee spent in their job(s) from the `job_history` table.
+# Solution:
+SELECT 
+    employee_id,
+    DATEDIFF(end_date, start_date) AS duration_in_days
+FROM
+    job_history;
+    
+
 
 -- Find the highest salary offered for each job title.
+# Solution:
 SELECT 
     JOB_ID, SUM(salary) AS highest_salary
 FROM
     employees
 GROUP BY JOB_ID;
 
+
+
 -- join
+
 -- List all employees along with their department names.
+# Solution:
 SELECT 
     e.FIRST_NAME, e.LAST_NAME, d.DEPARTMENT_NAME
 FROM
@@ -128,8 +183,245 @@ FROM
         JOIN
     departments AS d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID;
 
+
+
 -- Find all employees and their job titles.
+# Solution:
+SELECT 
+    CONCAT(e.first_name, ' ', e.last_name) AS full_name,
+    j.JOB_TITLE
+FROM 
+    employees AS e
+JOIN 
+    jobs AS j 
+ON 
+    e.JOB_ID = j.JOB_ID;
+
+
+    
+-- Retrieve the job history of each employee along with the department name they worked in.
+# Solution:
+SELECT 
+    jh.*, d.DEPARTMENT_NAME
+FROM
+    job_history AS jh
+        JOIN
+    departments AS d ON jh.DEPARTMENT_ID = d.DEPARTMENT_ID;
 
 
 
+-- List the employees who are currently working under the same manager, displaying the manager's name.
+# Solution:
+select FIRST_NAME, count(*) as employee_count, MANAGER_ID from employees group by MANAGER_ID;
 
+
+
+-- Retrieve the details of all departments located in a specific city i.e "Tokyo".
+# Solution:
+SELECT d.*, city
+FROM
+    departments AS d
+        JOIN
+    locations AS l ON d.LOCATION_ID= l.LOCATION_ID where l.CITY = 'Tokyo';
+
+
+    
+-- Retrieve the details of all departments located in a specific cities i.e "Sydney" and "Toronto".
+# Solution:
+SELECT 
+    d.*, city
+FROM
+    departments AS d
+        JOIN
+    locations AS l ON d.LOCATION_ID = l.LOCATION_ID
+WHERE
+    l.CITY IN ('Sydney' , 'Toronto');
+
+
+
+### LEFT JOIN
+
+-- List all employees and their managers, including those without managers.
+# Solution:
+SELECT 
+    e.EMPLOYEE_ID,
+    e.FIRST_NAME AS Employee_First_Name,
+    e.LAST_NAME AS Employee_Last_Name,
+    e.MANAGER_ID,
+    m.FIRST_NAME AS Manager_First_Name,
+    m.LAST_NAME AS Manager_Last_Name
+FROM 
+    employees e
+LEFT JOIN 
+    (SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME FROM employees) m 
+ON 
+    e.MANAGER_ID = m.EMPLOYEE_ID;
+
+
+
+-- Find all departments and their employees, including departments with no employees.
+# Solution:
+select e.FIRST_NAME, e.LAST_NAME, d.DEPARTMENT_NAME
+from departments as d left join employees as e on d.DEPARTMENT_ID = e.DEPARTMENT_ID;
+
+
+
+-- Retrieve a list of all job titles and the employees who have that job, including job titles with no employees.
+# Solution:
+select e.FIRST_NAME, e.LAST_NAME, j.JOB_TITLE
+from jobs as j left join employees as e on j.JOB_ID = e.JOB_ID;
+
+
+
+### RIGHT JOIN Assignments
+
+-- Find all employees and the locations they are working in, including locations without any employees.
+# Solution:
+SELECT 
+    e.FIRST_NAME, e.LAST_NAME, l.city as CITY
+FROM
+    employees AS e
+        JOIN
+    departments AS d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID
+        JOIN
+    locations AS l ON d.LOCATION_ID = l.LOCATION_ID;
+
+
+
+-- List all countries and the regions they belong to, including regions without any countries.
+# Solution:
+select c.COUNTRY_NAME, r.REGION_NAME
+from  regions as r right join countries as c on c.REGION_ID = r.REGION_ID;
+
+
+
+-- JOIN + Group BY
+
+-- List the number of employees working in each city.
+# Solution:
+SELECT 
+   count(*) as employee_count, l.city as city
+FROM
+    employees AS e
+        JOIN
+    departments AS d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID
+        JOIN
+    locations AS l ON d.LOCATION_ID = l.LOCATION_ID group by l.CITY;
+
+
+
+-- List the total salary expenditure for each department, along with the department name.
+# Solution:
+SELECT 
+    SUM(e.salary) as total_salary, d.DEPARTMENT_NAME
+FROM
+    employees AS e
+        LEFT JOIN
+    departments AS d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID
+GROUP BY d.DEPARTMENT_NAME;
+
+
+
+-- Count the number of employees in each city.
+# Solution:
+SELECT 
+   count(*) as employee_count, l.city as city
+FROM
+    employees AS e
+        JOIN
+    departments AS d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID
+        JOIN
+    locations AS l ON d.LOCATION_ID = l.LOCATION_ID group by l.CITY;
+
+
+
+-- Calculate the average salary for each job title within each department.
+# Solution:
+SELECT 
+    d.DEPARTMENT_NAME,
+    j.JOB_TITLE,
+    AVG(e.SALARY) AS average_salary
+FROM 
+    employees AS e
+JOIN 
+    departments AS d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID
+JOIN 
+    jobs AS j ON e.JOB_ID = j.JOB_ID
+GROUP BY 
+    d.DEPARTMENT_NAME, 
+    j.JOB_TITLE;
+
+
+
+-- List the number of employees hired in each year for each job title.
+# Solution:
+SELECT 
+    j.JOB_TITLE,
+    YEAR(jh.START_DATE) AS hire_year,
+    COUNT(*) AS employee_count
+FROM 
+    employees AS e
+JOIN 
+    jobs AS j ON e.JOB_ID = j.JOB_ID
+JOIN 
+    job_history AS jh ON j.JOB_ID = jh.JOB_ID
+GROUP BY 
+    j.JOB_TITLE, 
+    YEAR(jh.START_DATE);
+
+
+
+-- Find the highest salary paid in each region.
+# Solution:
+SELECT 
+    SUM(e.SALARY) AS highest_salary, r.REGION_NAME
+FROM
+    employees AS e
+        JOIN
+    departments AS d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID
+        JOIN
+    locations AS l ON d.LOCATION_ID = l.LOCATION_ID
+        JOIN
+    countries AS c ON l.COUNTRY_ID = c.COUNTRY_ID
+        RIGHT JOIN
+    regions AS r ON c.REGION_ID = r.REGION_ID
+GROUP BY r.REGION_ID order by highest_salary desc;
+
+
+
+-- Count the number of employees in each country.
+# Solution:
+SELECT 
+    COUNT(*) AS employee_count, c.COUNTRY_NAME
+FROM
+    employees AS e
+        JOIN
+    departments AS d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID
+        JOIN
+    locations AS l ON d.LOCATION_ID = l.LOCATION_ID
+        RIGHT JOIN
+    countries AS c ON l.COUNTRY_ID = c.COUNTRY_ID
+GROUP BY c.COUNTRY_NAME;
+
+
+
+-- Calculate the average salary and the number of employees for each department located in a specific region.
+# Solution:
+SELECT 
+    AVG(e.SALARY) AS average_salary, 
+    d.DEPARTMENT_NAME, 
+    r.REGION_NAME,
+    COUNT(e.EMPLOYEE_ID) AS employee_count
+FROM
+    employees AS e
+JOIN 
+    departments AS d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID
+JOIN 
+    locations AS l ON d.LOCATION_ID = l.LOCATION_ID
+JOIN 
+    countries AS c ON l.COUNTRY_ID = c.COUNTRY_ID
+JOIN 
+    regions AS r ON c.REGION_ID = r.REGION_ID
+GROUP BY 
+    d.DEPARTMENT_NAME, 
+    r.REGION_NAME;
